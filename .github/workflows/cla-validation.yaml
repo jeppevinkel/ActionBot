@@ -7,9 +7,6 @@ on:
 permissions:
   pull-requests: write
 
-env:
-  DEFAULT_BRANCH: master
-
 jobs:
   validate-cla:
     runs-on: ubuntu-latest
