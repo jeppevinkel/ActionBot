@@ -68,9 +68,23 @@ jobs:
         uses: actions/github-script@v8
         with:
           script: |
-            github.rest.issues.removeLabel({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              name: 'cla-not-signed'
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number
             });
+
+            const labelToRemove = 'needs-review';
+            const hasLabel = labels.some(label => label.name === labelToRemove);
+
+            if (hasLabel) {
+              github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'cla-not-signed'
+              });
+            }
