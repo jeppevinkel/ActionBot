@@ -1,0 +1,31 @@
+name: CLA Validation
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  check-cla:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check if author is in CLA
+        shell: pwsh
+        env:
+          AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+        run: |
+          $selector = Select-String -Path CLA.md -Pattern "- $Env:AUTHOR_LOGIN"
+
+          if ($SEL -ne $null)
+          {
+            "$Env:AUTHOR_LOGIN is in the CLA" >> $Env:GITHUB_STEP_SUMMARY
+          }
+          else
+          {
+            "$Env:AUTHOR_LOGIN is not in the CLA" >> $Env:GITHUB_STEP_SUMMARY
+          }
