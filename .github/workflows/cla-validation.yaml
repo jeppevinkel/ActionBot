@@ -49,4 +49,4 @@ jobs:
               body: `⚠️ Pull requests will only be accepted if the [CLA](../CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](../CLA.md) with your GitHub username. In order to contribute to this project, you must read the CLA fully, and then appent the following to the bottom of the document to sign it.\n\n\`\`\`\n- ${authorLogin}\n\n\`\`\``
             })
 
-            core.setfailed('Failing action until CLA has been signed')
+            core.setFailed('Failing action until CLA has been signed')
