@@ -62,3 +62,15 @@ jobs:
             });
 
             core.setFailed('Failing action until CLA has been signed');
+
+      - name: Remove label if CLA is signed
+        if: steps.validate-cla.outputs.in_cla == 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              name: 'cla-not-signed'
+            });
