@@ -47,19 +47,33 @@ jobs:
             const authorLogin = process.env.AUTHOR_LOGIN;
             const defaultBranch = process.env.DEFUALT_BRANCH;
 
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `⚠️ Pull requests will only be accepted if the [CLA](../blob/${defaultBranch}/CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](../blob/${defaultBranch}/CLA.md) with your GitHub username. In order to contribute to this project, you must read the CLA fully, and then append the following to the bottom of the document to sign it.\n\n\`\`\`\n- ${authorLogin}\n\n\`\`\``
+            const { owner, repo } = context.repo;
+            const issue_number = context.issue.number;
+
+            const { data: labels } = await github.rest.issues.listLabelsOnIssue({
+              owner,
+              repo,
+              issue_number
             });
 
-            github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: ['cla-not-signed']
-            });
+            const hasLabel = labels.some(label => label.name === 'cla-not-signed');
+
+            // Only comment if it hasn't already labeled the PR
+            if (!hasLabel) {
+              github.rest.issues.createComment({
+                issue_number: issue_number,
+                owner: owner,
+                repo: repo,
+                body: `⚠️ Pull requests will only be accepted if the [CLA](../blob/${defaultBranch}/CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](../blob/${defaultBranch}/CLA.md) with your GitHub username. In order to contribute to this project, you must read the CLA fully, and then append the following to the bottom of the document to sign it.\n\n\`\`\`\n- ${authorLogin}\n\n\`\`\``
+              });
+
+              github.rest.issues.addLabels({
+                owner: owner,
+                repo: repo,
+                issue_number: issue_number,
+                labels: ['cla-not-signed']
+              });
+            }
 
             core.setFailed('Failing action until CLA has been signed');
 
@@ -77,14 +91,13 @@ jobs:
               issue_number
             });
 
-            const labelToRemove = 'needs-review';
-            const hasLabel = labels.some(label => label.name === labelToRemove);
+            const hasLabel = labels.some(label => label.name === 'cla-not-signed');
 
             if (hasLabel) {
               github.rest.issues.removeLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
+                owner: owner,
+                repo: repo,
+                issue_number: issue_number,
                 name: 'cla-not-signed'
               });
             }
