@@ -39,7 +39,7 @@ jobs:
         with:
           script: |
             github.rest.issues.createComment({
-              issue_number: context.issues.number,
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: '⚠️ Pull requests will only be accepted if the [CLA](CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](CLA.md) with your GitHub username. Please make sure to sign it before your pull request can be merged.'
