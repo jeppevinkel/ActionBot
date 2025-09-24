@@ -7,6 +7,9 @@ on:
 permissions:
   pull-requests: write
 
+env:
+  DEFAULT_BRANCH: master
+
 jobs:
   validate-cla:
     runs-on: ubuntu-latest
@@ -38,15 +41,17 @@ jobs:
         uses: actions/github-script@v8
         env:
           AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
+          DEFUALT_BRANCH: ${{ github.event.repository.default_branch }}
         with:
           script: |
             const authorLogin = process.env.AUTHOR_LOGIN;
+            const defaultBranch = process.env.DEFUALT_BRANCH;
 
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `⚠️ Pull requests will only be accepted if the [CLA](../CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](../CLA.md) with your GitHub username. In order to contribute to this project, you must read the CLA fully, and then append the following to the bottom of the document to sign it.\n\n\`\`\`\n- ${authorLogin}\n\n\`\`\``
+              body: `⚠️ Pull requests will only be accepted if the [CLA](../blob/${defaultBranch}/CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](../blob/${defaultBranch}/CLA.md) with your GitHub username. In order to contribute to this project, you must read the CLA fully, and then append the following to the bottom of the document to sign it.\n\n\`\`\`\n- ${authorLogin}\n\n\`\`\``
             });
 
             core.setFailed('Failing action until CLA has been signed');
