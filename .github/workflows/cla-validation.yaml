@@ -21,7 +21,7 @@ jobs:
         run: |
           $selector = Select-String -Path CLA.md -Pattern "- $Env:AUTHOR_LOGIN"
 
-          if ($SEL -ne $null)
+          if ($selector -ne $null)
           {
             "$Env:AUTHOR_LOGIN is in the CLA" >> $Env:GITHUB_STEP_SUMMARY
           }
