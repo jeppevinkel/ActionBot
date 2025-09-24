@@ -54,4 +54,11 @@ jobs:
               body: `⚠️ Pull requests will only be accepted if the [CLA](../blob/${defaultBranch}/CLA.md) has been signed.\n\nIt appears that you have not yet signed the [CLA](../blob/${defaultBranch}/CLA.md) with your GitHub username. In order to contribute to this project, you must read the CLA fully, and then append the following to the bottom of the document to sign it.\n\n\`\`\`\n- ${authorLogin}\n\n\`\`\``
             });
 
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['cla-not-signed']
+            });
+
             core.setFailed('Failing action until CLA has been signed');
